@@ -1,0 +1,20 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Scraper output (generado en cada ejecución — no versionar su contenido,
+# pero se conservan las carpetas vía .gitkeep)
+pdfs/*
+!pdfs/.gitkeep
+output/*
+!output/.gitkeep
+*.log
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp

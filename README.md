@@ -84,8 +84,8 @@ Cada fila de la tabla aporta: **Nº**, **Número de expediente**, **Administrado
 ## Instalación
 
 ```bash
-git clone <URL-de-tu-repo>
-cd scraper-challenge
+git clone https://github.com/LuisKido/magnar-desafio-scraping.git
+cd magnar-desafio-scraping
 npm install
 ```
 
@@ -131,7 +131,7 @@ node dist/index.js --max-pages 2
 ## Salida
 
 ```
-scraper-challenge/
+magnar-desafio-scraping/
 ├── output/
 │   ├── documents.json   # metadatos de todos los documentos (estructurado)
 │   ├── documents.csv    # los mismos datos en CSV (BOM UTF-8, abre en Excel)

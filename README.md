@@ -5,20 +5,38 @@ Scraper en **TypeScript** que navega, extrae y descarga documentos de un sitio
 **parsing HTML** (`cheerio`). **Sin automatización de navegador** (no usa
 Puppeteer, Playwright ni Selenium).
 
+> ### ℹ️ Sobre el sitio elegido (léase primero)
+>
+> El enunciado propone **dos sitios** para resolver el desafío:
+>
+> - **Primario** — Jurisprudencia del **Poder Judicial del Perú**. El propio
+>   enunciado indica: *"requiere VPN a Perú"*.
+> - **Alternativo** — Repositorio Digital de la **OEFA**. El enunciado lo
+>   describe textualmente como: *"Sitio web alternativo (opcional, sin VPN) …
+>   Este sitio es opcional y puede usarse para desarrollo/pruebas sin necesidad
+>   de VPN."*
+>
+> **Este scraper resuelve el desafío sobre el sitio de la OEFA**, porque es el
+> objetivo **públicamente accesible sin VPN** y, por tanto, **verificable de
+> forma reproducible por quien evalúe** (basta `npm install && npm run scrape`,
+> sin infraestructura adicional).
+>
+> Ambos sitios están construidos con la **misma tecnología** (JSF + PrimeFaces)
+> y comparten el mismo patrón de navegación, paginación y descarga. Por eso el
+> scraper está diseñado para ser **reapuntable**: toda la parte específica del
+> sitio (URL e identificadores JSF) está aislada en un único objeto de
+> configuración `TargetConfig` en [`src/config.ts`](src/config.ts). Migrar al
+> sitio del Poder Judicial (con VPN) consiste en **crear un nuevo `TargetConfig`**
+> con sus ids; la lógica de sesión, `ViewState`, paginación, descarga y manejo de
+> 429 se reutiliza **sin cambios**. Ver la sección
+> [Apuntar a otro sitio JSF](#apuntar-a-otro-sitio-jsf-p-ej-poder-judicial).
+
 ## Objetivo
 
-El desafío propone dos sitios equivalentes:
-
-| Sitio | URL | Estado |
-|-------|-----|--------|
-| **Poder Judicial del Perú** (primario) | `https://jurisprudencia.pj.gob.pe/jurisprudenciaweb/faces/page/resultado.xhtml` | Requiere **VPN a Perú** |
-| **OEFA — Tribunal de Fiscalización Ambiental** (alternativo) | `https://publico.oefa.gob.pe/repdig/consulta/consultaTfa.xhtml` | Público, **sin VPN** |
-
-Este scraper está implementado y probado end-to-end contra el sitio de la
-**OEFA** (accesible sin VPN). Ambos sitios comparten la misma tecnología base
-(JSF + PrimeFaces), por lo que la arquitectura es reutilizable: apuntar al sitio
-del Poder Judicial es cuestión de ajustar la configuración en
-[`src/config.ts`](src/config.ts) (URL, ids del formulario y de la tabla).
+| Sitio | URL | Acceso | En este repo |
+|-------|-----|--------|--------------|
+| **Poder Judicial del Perú** (primario) | `https://jurisprudencia.pj.gob.pe/jurisprudenciaweb/faces/page/resultado.xhtml` | Requiere **VPN a Perú** | Soportado por configuración (no verificable sin VPN) |
+| **OEFA — Tribunal de Fiscalización Ambiental** (alternativo, elegido) | `https://publico.oefa.gob.pe/repdig/consulta/consultaTfa.xhtml` | **Público, sin VPN** | ✅ Implementado y probado end-to-end |
 
 > El sitio de la OEFA publica **1 753 resoluciones** del Tribunal de
 > Fiscalización Ambiental repartidas en **176 páginas** (10 por página).
@@ -186,14 +204,45 @@ src/
 └── storage.ts      # persistencia (JSON, CSV, PDFs, failures)
 ```
 
+## Apuntar a otro sitio JSF (p. ej. Poder Judicial)
+
+Toda la parte específica del sitio está aislada en un objeto `TargetConfig` en
+[`src/config.ts`](src/config.ts). Para apuntar a otro sitio JSF/PrimeFaces
+(como el del **Poder Judicial del Perú**, que requiere VPN a Perú) basta con
+declarar un nuevo objetivo y asignarlo a `TARGET`:
+
+```ts
+export const PODER_JUDICIAL_TARGET: TargetConfig = {
+  name: 'Poder Judicial del Perú - Jurisprudencia',
+  url: 'https://jurisprudencia.pj.gob.pe/jurisprudenciaweb/faces/page/resultado.xhtml',
+  formId: '...',            // id/name del <form> JSF
+  searchButtonId: '...',    // clientId del botón "Buscar"
+  dataTableId: '...',       // clientId de la <p:dataTable> de resultados
+  searchRenderIds: '...',   // componentes a renderizar tras buscar
+  formFields: ['...'],      // campos del formulario (se envían vacíos)
+  rowsPerPage: 10,          // filas por página que devuelve la tabla
+};
+
+// Cambiar el objetivo activo:
+export const TARGET: TargetConfig = PODER_JUDICIAL_TARGET;
+```
+
+Los identificadores (`formId`, `searchButtonId`, `dataTableId`, `formFields`,
+etc.) se obtienen **inspeccionando el HTML** del formulario del sitio, tal como
+se hizo con la OEFA (ver [Cómo funciona](#cómo-funciona-estructura-descubierta)).
+**Nada más cambia**: la gestión de sesión y `ViewState`, la paginación, la
+descarga de PDFs y el manejo de errores 429 son agnósticos del sitio y se
+reutilizan sin modificaciones.
+
+> Nota: el objetivo del Poder Judicial no se incluye preconfigurado porque sus
+> identificadores JSF no pueden verificarse sin VPN a Perú; añadir valores no
+> comprobados daría una falsa impresión de estar probado. La OEFA queda como el
+> objetivo por defecto, verificable de forma reproducible.
+
 ## Notas
 
 - Este scraper se desarrolló con fines del desafío técnico. Aplica delays y
   reintentos respetuosos con el servidor.
-- Para apuntar al sitio del **Poder Judicial** (requiere VPN a Perú), ajustar
-  `TARGET` en [`src/config.ts`](src/config.ts) con la URL y los identificadores
-  JSF de ese formulario/tabla; la lógica de sesión, paginación, descarga y
-  manejo de 429 se reutiliza sin cambios.
 
 ## Licencia
 

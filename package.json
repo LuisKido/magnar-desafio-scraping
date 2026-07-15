@@ -7,6 +7,8 @@
     "build": "tsc",
     "start": "ts-node src/index.ts",
     "scrape": "ts-node src/index.ts",
+    "scrape:test": "ts-node src/index.ts --max-pages 1 --max-downloads 2",
+    "scrape:sample": "ts-node src/index.ts --max-pages 3 --max-downloads 5",
     "scrape:meta": "ts-node src/index.ts --no-pdf",
     "retry": "ts-node src/index.ts --retry-failed",
     "typecheck": "tsc --noEmit"

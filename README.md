@@ -91,25 +91,34 @@ npm install
 
 ## Uso
 
+### Scripts predefinidos (recomendado — funcionan en cualquier terminal)
+
 ```bash
-# Extraer metadatos de TODAS las páginas y descargar TODOS los PDFs
-npm run scrape
-
-# Solo metadatos, sin descargar PDFs
-npm run scrape -- --no-pdf
-
-# Prueba rápida: 3 páginas de metadatos y 5 PDFs
-npm run scrape -- --max-pages 3 --max-downloads 5
-
-# Reintentar solo las descargas que fallaron (usa output/failures.json)
-npm run retry
-
-# Ayuda
-npm run scrape -- --help
+npm run scrape          # TODAS las páginas + descarga TODOS los PDFs
+npm run scrape:test     # Prueba rápida: 1 página (10 registros) + 2 PDFs
+npm run scrape:sample   # 3 páginas (30 registros) + 5 PDFs
+npm run scrape:meta     # Solo metadatos, sin descargar PDFs
+npm run retry           # Reintenta solo las descargas fallidas (failures.json)
 ```
 
-> Nota sobre `npm run ... -- <args>`: el `--` es necesario para que npm pase los
-> argumentos al script y no los interprete él mismo.
+### Con opciones personalizadas
+
+Para pasar opciones propias (p. ej. otros límites), invoca el script
+directamente con `npx`. **Esta forma funciona igual en Windows PowerShell,
+CMD, macOS y Linux:**
+
+```bash
+npx ts-node src/index.ts --max-pages 3 --max-downloads 5
+npx ts-node src/index.ts --no-pdf
+npx ts-node src/index.ts --help
+```
+
+> ⚠️ **Nota (Windows PowerShell)**: evita la forma `npm run scrape -- --max-pages 3`.
+> En PowerShell, npm no reenvía correctamente los argumentos que van tras `--`
+> (los interpreta como configuración propia y no llegan al script). Usa los
+> **scripts predefinidos** de arriba o la forma **`npx ts-node …`**, que no
+> tienen ese problema. En Bash/CMD la forma `npm run scrape -- <args>` sí
+> funciona, pero `npx ts-node …` es la más portable.
 
 ### Opciones de línea de comandos
 

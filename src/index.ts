@@ -67,10 +67,16 @@ Opciones:
   --retry-failed          Reintentar solo las descargas fallidas previas.
   -h, --help              Mostrar esta ayuda.
 
-Ejemplos:
-  npm run scrape -- --max-pages 2 --max-downloads 5
-  npm run scrape -- --no-pdf
-  npm run retry
+Scripts predefinidos (recomendado):
+  npm run scrape          Todas las páginas + todos los PDFs.
+  npm run scrape:test     1 página + 2 PDFs (prueba rápida).
+  npm run scrape:sample   3 páginas + 5 PDFs.
+  npm run scrape:meta     Solo metadatos (sin PDFs).
+  npm run retry           Reintenta las descargas fallidas.
+
+Con opciones personalizadas (portable, incl. Windows PowerShell):
+  npx ts-node src/index.ts --max-pages 2 --max-downloads 5
+  npx ts-node src/index.ts --no-pdf
 `);
 }
 
